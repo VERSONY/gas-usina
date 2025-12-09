@@ -12,16 +12,16 @@ HTML_PAGE = """
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>GÁS USINA - Atendimento pelo WhatsApp</title>
+  <title>GÁS USINA - Peça seu gás pelo WhatsApp</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
     body {
-      background: #f5f5f5;
-      color: #222;
+      background: #f3f4f6;
+      color: #111827;
     }
     .page {
-      max-width: 900px;
+      max-width: 1024px;
       margin: 0 auto;
       padding: 20px 16px 40px;
     }
@@ -30,33 +30,77 @@ HTML_PAGE = """
       margin-bottom: 24px;
     }
     .logo {
-      font-size: 32px;
+      font-size: 30px;
       font-weight: 800;
-      color: #e65100;
-      letter-spacing: 1px;
+      color: #1f2937;
+      letter-spacing: 0.04em;
     }
     .slogan {
       font-size: 14px;
-      color: #555;
+      color: #6b7280;
       margin-top: 4px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #2563eb, #22c55e);
+      border-radius: 18px;
+      padding: 14px 16px;
+      color: #ecfeff;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .hero-text-main {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .hero-text-sub {
+      font-size: 13px;
+      opacity: 0.95;
+    }
+    .hero-tag {
+      font-size: 12px;
+      background: rgba(15, 23, 42, 0.25);
+      padding: 4px 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .hero-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.4);
+      animation: pulse 1.4s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.6; }
+      100% { transform: scale(1); opacity: 1; }
     }
 
     .layout {
       display: grid;
       gap: 18px;
     }
-    @media (min-width: 768px) {
+    @media (min-width: 820px) {
       .layout {
         grid-template-columns: 1.2fr 1fr;
+        align-items: flex-start;
       }
     }
 
-    /* Bloco de chat */
+    /* Card de chat WhatsApp */
     .chat-card {
       background: #ffffff;
       border-radius: 18px;
       padding: 18px 16px 22px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.09);
     }
     .chat-header {
       display: flex;
@@ -70,7 +114,7 @@ HTML_PAGE = """
       border-radius: 50%;
       overflow: hidden;
       background: #ffffff;
-      border: 2px solid #e0e0e0;
+      border: 2px solid #e5e7eb;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -81,7 +125,6 @@ HTML_PAGE = """
       object-fit: cover;
       display: block;
     }
-
     .chat-agent {
       display: flex;
       flex-direction: column;
@@ -90,17 +133,30 @@ HTML_PAGE = """
     .chat-agent-name {
       font-size: 14px;
       font-weight: 700;
+      color: #111827;
     }
     .chat-agent-status {
       font-size: 12px;
-      color: #2e7d32;
+      color: #16a34a;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #16a34a;
+      box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.35);
+      animation: pulse 1.4s infinite;
+    }
+
     .chat-body {
-      background: #e3f2fd;
+      background: #e0f2fe;
       border-radius: 14px;
       padding: 10px 12px;
       font-size: 13px;
-      color: #333;
+      color: #111827;
       margin-bottom: 14px;
     }
     .chat-body p + p {
@@ -108,8 +164,11 @@ HTML_PAGE = """
     }
     .chat-info {
       font-size: 12px;
-      color: #777;
+      color: #6b7280;
       margin-bottom: 10px;
+    }
+    .chat-info strong {
+      color: #111827;
     }
     .whatsapp-btn {
       display: inline-flex;
@@ -117,43 +176,100 @@ HTML_PAGE = """
       justify-content: center;
       gap: 8px;
       text-decoration: none;
-      background: #25D366;
+      background: #22c55e;
       color: #ffffff;
       font-weight: 600;
       font-size: 15px;
       padding: 11px 16px;
       border-radius: 999px;
-      box-shadow: 0 4px 12px rgba(37,211,102,0.4);
+      box-shadow: 0 10px 26px rgba(34, 197, 94, 0.55);
+    }
+    .whatsapp-btn span {
+      font-size: 18px;
     }
     .whatsapp-btn:hover {
       opacity: 0.96;
     }
 
+    /* Card lateral: QR + mapa */
+    .side-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 16px 14px 18px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+    }
+    .side-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #111827;
+    }
+    .side-sub {
+      font-size: 12px;
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+    .qr-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .qr-box {
+      border-radius: 12px;
+      padding: 6px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+    }
+    .qr-box img {
+      display: block;
+      width: 120px;
+      height: 120px;
+    }
+    .qr-text {
+      font-size: 12px;
+      color: #4b5563;
+      max-width: 220px;
+    }
+
+    .map-wrapper {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #e5e7eb;
+      background: #f3f4f6;
+    }
+    .map-frame {
+      width: 100%;
+      height: 170px;
+      border: 0;
+    }
+
     /* Seção Como Chegar */
     .section {
       background: #ffffff;
-      border-radius: 16px;
+      border-radius: 18px;
       padding: 16px 14px 18px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-      margin-top: 10px;
+      box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+      margin-top: 18px;
     }
     .section-title {
       font-size: 16px;
       font-weight: 700;
       margin-bottom: 8px;
-      color: #333;
+      color: #111827;
     }
     .section p {
       font-size: 14px;
-      color: #444;
+      color: #374151;
       margin-bottom: 6px;
       line-height: 1.4;
     }
     .badge-ref {
       display: inline-block;
       font-size: 12px;
-      background: #fff3cd;
-      color: #7a5a00;
+      background: #fef3c7;
+      color: #92400e;
       padding: 4px 8px;
       border-radius: 999px;
       margin-top: 4px;
@@ -168,22 +284,22 @@ HTML_PAGE = """
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 9px 14px;
+      padding: 8px 12px;
       border-radius: 999px;
       font-size: 13px;
       text-decoration: none;
-      border: 1px solid #1976d2;
-      color: #1976d2;
-      background: #e3f2fd;
+      border: 1px solid #2563eb;
+      color: #1d4ed8;
+      background: #e0edff;
       cursor: pointer;
     }
     .btn-link:hover {
-      background: #d1e7fb;
+      background: #d1e3ff;
     }
 
     /* Fotos */
     .photos-section {
-      margin-top: 16px;
+      margin-top: 18px;
     }
     .photos-grid {
       display: grid;
@@ -192,15 +308,15 @@ HTML_PAGE = """
       margin-top: 10px;
     }
     .photo-card {
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
-      background: #eee;
-      height: 120px;
+      background: #e5e7eb;
+      height: 130px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 12px;
-      color: #555;
+      color: #4b5563;
       text-align: center;
       padding: 4px;
     }
@@ -212,10 +328,10 @@ HTML_PAGE = """
     }
 
     footer {
-      margin-top: 18px;
+      margin-top: 20px;
       text-align: center;
       font-size: 11px;
-      color: #777;
+      color: #9ca3af;
     }
   </style>
 </head>
@@ -223,8 +339,19 @@ HTML_PAGE = """
   <div class="page">
     <header>
       <div class="logo">GÁS USINA</div>
-      <div class="slogan">Atendimento rápido pelo WhatsApp e depósito físico à sua disposição.</div>
+      <div class="slogan">Peça seu gás pelo WhatsApp ou venha até nosso depósito.</div>
     </header>
+
+    <div class="hero">
+      <div>
+        <div class="hero-text-main">Entrega rápida de gás na sua região</div>
+        <div class="hero-text-sub">Atendimento humanizado, com segurança e confiança, direto pelo WhatsApp.</div>
+      </div>
+      <div class="hero-tag">
+        <span class="hero-dot"></span>
+        <span>Aberto hoje · 09:00 às 22:00</span>
+      </div>
+    </div>
 
     <div class="layout">
       <!-- BLOCO: CHAT VIA WHATSAPP -->
@@ -236,7 +363,9 @@ HTML_PAGE = """
             </div>
             <div class="chat-agent">
               <div class="chat-agent-name">Atendimento GÁS USINA</div>
-              <div class="chat-agent-status">🟢 Online agora</div>
+              <div class="chat-agent-status">
+                <span class="status-dot"></span> Online agora
+              </div>
             </div>
           </div>
 
@@ -246,86 +375,99 @@ HTML_PAGE = """
           </div>
 
           <div class="chat-info">
-            • Atendimento pelo WhatsApp: todos os dias, das 8h às 22h.
+            <strong>Horário WhatsApp:</strong> todos os dias, das <strong>09:00 às 22:00</strong>.
           </div>
 
-          <a
-            class="whatsapp-btn"
-            href="{{ whatsapp_url }}"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            💬 Iniciar atendimento no WhatsApp
+          <a class="whatsapp-btn" href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer">
+            <span>💬</span> <span>Iniciar atendimento no WhatsApp</span>
           </a>
         </div>
       </div>
 
-      <!-- BLOCO: COMO CHEGAR -->
+      <!-- BLOCO: QR CODE + MAPA -->
       <div>
-        <div class="section">
-          <div class="section-title">Como chegar ao depósito GÁS USINA</div>
-          <p>
-            <strong>Endereço:</strong><br>
-            Rua Exemplo, 123 – Bairro Central<br>
-            Cidade/UF – CEP 00000-000
-          </p>
-          <p>
-            <strong>Pontos de referência:</strong><br>
-            • 200m após o Supermercado Exemplo<br>
-            • Ao lado do Posto de Combustível Modelo<br>
-            • Fácil acesso pela Avenida Principal
-          </p>
-          <span class="badge-ref">Fácil estacionamento em frente ao depósito</span>
+        <div class="side-card">
+          <div class="side-title">Pedir pelo QR Code</div>
+          <div class="side-sub">Aponte a câmera do celular para abrir o WhatsApp direto no nosso atendimento.</div>
 
-          <div class="buttons-row">
-            <a
-              class="btn-link"
-              href="https://www.google.com/maps/search/?api=1&query=Gas+Usina,+Rua+Exemplo+123,+Cidade+UF"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              🗺️ Abrir no Google Maps
-            </a>
-            <a
-              class="btn-link"
-              href="https://waze.com/ul"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              🚗 Ir com Waze
-            </a>
+          <div class="qr-wrapper">
+            <div class="qr-box">
+              <img src="{{ qr_url }}" alt="QR Code WhatsApp GÁS USINA">
+            </div>
+            <div class="qr-text">
+              Abra a câmera do seu celular ou o app de leitura de QR Code e aponte para o código ao lado. Você será direcionado diretamente para o nosso WhatsApp.
+            </div>
           </div>
 
-          <p class="chat-info">
-            Horário de atendimento no depósito: segunda a sábado, das 8h às 18h.
-          </p>
+          <div class="side-title" style="margin-top: 6px;">Nosso depósito no mapa</div>
+          <div class="side-sub">Veja a localização da GÁS USINA e trace sua rota até nós.</div>
+
+          <div class="map-wrapper">
+            <iframe
+              class="map-frame"
+              src="https://www.google.com/maps?q=Gas+Usina&output=embed"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- BLOCO: FOTOS DO DEPÓSITO -->
-    <div class="section photos-section">
-      <div class="section-title">Fotos do nosso depósito</div>
+    <!-- SEÇÃO: COMO CHEGAR -->
+    <div class="section">
+      <div class="section-title">Como chegar ao depósito GÁS USINA</div>
       <p>
-        Veja um pouco da estrutura da GÁS USINA. Local organizado, seguro e pronto
-        para atender você com rapidez.
+        <strong>Endereço:</strong><br>
+        Rua Exemplo, 123 – Bairro Central<br>
+        Cidade/UF – CEP 00000-000
       </p>
 
-     <div class="photos-grid">
-  <div class="photo-card">
-    <img src="/static/deposito1.jpg" alt="Depósito Gás Usina 1">
-  </div>
-  <div class="photo-card">
-    <img src="/static/deposito2.jpg" alt="Depósito Gás Usina 2">
-  </div>
-  <div class="photo-card">
-    <img src="/static/deposito3.jpg" alt="Caminhão de entrega Gás Usina">
-  </div>
-  <div class="photo-card">
-    <img src="/static/deposito4.jpg" alt="Botijões organizados Gás Usina">
-  </div>
-</div>
+      <p>
+        <strong>Pontos de referência:</strong><br>
+        • 200m após o Supermercado Exemplo<br>
+        • Ao lado do Posto de Combustível Modelo<br>
+        • Fácil acesso pela Avenida Principal
+      </p>
 
+      <span class="badge-ref">Fácil estacionamento em frente ao depósito</span>
+
+      <div class="buttons-row">
+        <a class="btn-link" href="https://www.google.com/maps/search/?api=1&query=Gas+Usina" target="_blank">
+          🗺️ Abrir no Google Maps
+        </a>
+        <a class="btn-link" href="https://waze.com/ul" target="_blank">
+          🚗 Ir com Waze
+        </a>
+      </div>
+
+      <p class="chat-info" style="margin-top: 10px;">
+        <strong>Horário do depósito:</strong><br>
+        • Segunda a sexta: 09:00 às 22:00<br>
+        • Sábado e domingo: 09:00 às 15:00
+      </p>
+    </div>
+
+    <!-- SEÇÃO: FOTOS -->
+    <div class="section photos-section">
+      <div class="section-title">Fotos do nosso depósito</div>
+      <p>Veja um pouco da estrutura da GÁS USINA. Local organizado, seguro e pronto para atender você com rapidez.</p>
+
+      <div class="photos-grid">
+        <div class="photo-card">
+          <img src="/static/deposito1.jpg" alt="Depósito Gás Usina - Fachada">
+        </div>
+        <div class="photo-card">
+          Foto do depósito 2 (adicione como <code>deposito2.jpg</code> na pasta <code>static/</code>).
+        </div>
+        <div class="photo-card">
+          Foto do caminhão de entrega (arquivo <code>deposito3.jpg</code>).
+        </div>
+        <div class="photo-card">
+          Foto dos botijões organizados (arquivo <code>deposito4.jpg</code>).
+        </div>
+      </div>
+    </div>
 
     <footer>
       GÁS USINA · Atendimento rápido pelo WhatsApp · Depósito físico à sua disposição.
@@ -339,7 +481,12 @@ HTML_PAGE = """
 def index():
     encoded_msg = urllib.parse.quote(WHATSAPP_MESSAGE)
     whatsapp_url = f"https://wa.me/{WHATSAPP_NUMBER}?text={encoded_msg}"
-    return render_template_string(HTML_PAGE, whatsapp_url=whatsapp_url)
+
+    # Gera URL do QR Code com base no link do WhatsApp
+    qr_data = urllib.parse.quote(whatsapp_url, safe="")
+    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={qr_data}"
+
+    return render_template_string(HTML_PAGE, whatsapp_url=whatsapp_url, qr_url=qr_url)
 
 if __name__ == "__main__":
     app.run(debug=True)
