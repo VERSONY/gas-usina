@@ -1,49 +1,19 @@
-import re
-import sqlite3
-from pathlib import Path
-from flask import Flask, request, redirect, render_template_string
+from flask import Flask, render_template_string
+import urllib.parse
 
 app = Flask(__name__)
 
-# 🔧 CONFIGURAÇÕES BÁSICAS
-WHATSAPP_NUMBER = "5511988180989"  # Número comercial GÁS USINA (DDD do país + DDD + número)
-WHATSAPP_MESSAGE = "Olá! Gostaria de pedir gás da GÁS USINA."  # Mensagem automática
+# Configuração do WhatsApp da GÁS USINA
+WHATSAPP_NUMBER = "5511988180989"
+WHATSAPP_MESSAGE = "Olá! Gostaria de falar com a GÁS USINA sobre pedido de gás."
 
-DB_PATH = Path("clientes.db")
-
-
-def get_db():
-    """Abre conexão com o banco SQLite."""
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
-def init_db():
-    """Cria a tabela de clientes, se ainda não existir."""
-    conn = get_db()
-    conn.execute(
-        """
-        CREATE TABLE IF NOT EXISTS clientes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            telefone TEXT UNIQUE NOT NULL,
-            criado_em TEXT NOT NULL
-        );
-        """
-    )
-    conn.commit()
-    conn.close()
-
-
-# Inicializa o banco ao iniciar a aplicação
-init_db()
 
 HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>GÁS USINA - Peça seu gás pelo WhatsApp</title>
+  <title>GÁS USINA - Atendimento pelo WhatsApp</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
@@ -71,69 +41,96 @@ HTML_PAGE = """
       color: #555;
       margin-top: 4px;
     }
-    .main-card {
+
+    .layout {
+      display: grid;
+      gap: 18px;
+    }
+    @media (min-width: 768px) {
+      .layout {
+        grid-template-columns: 1.2fr 1fr;
+      }
+    }
+
+    /* Bloco de chat */
+    .chat-card {
       background: #ffffff;
-      border-radius: 16px;
-      padding: 18px 16px 24px;
+      border-radius: 18px;
+      padding: 18px 16px 22px;
       box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-      margin-bottom: 20px;
     }
-    .main-title {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    .main-text {
-      font-size: 14px;
-      color: #444;
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       margin-bottom: 14px;
     }
-    form {
-      margin-bottom: 4px;
-    }
-    .field-label {
-      font-size: 13px;
-      margin-bottom: 4px;
-      color: #444;
-    }
-    input[type="tel"] {
-      width: 100%;
-      padding: 10px 12px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-    }
-    button[type="submit"] {
-      width: 100%;
-      padding: 11px 12px;
-      border-radius: 999px;
-      border: none;
-      background: #25D366;
+    .chat-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #e65100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: #fff;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
+      font-size: 18px;
+      font-weight: bold;
     }
-    button[type="submit"]:hover {
+    .chat-agent {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .chat-agent-name {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .chat-agent-status {
+      font-size: 12px;
+      color: #2e7d32;
+    }
+    .chat-body {
+      background: #e3f2fd;
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: #333;
+      margin-bottom: 14px;
+    }
+    .chat-body p + p {
+      margin-top: 6px;
+    }
+    .chat-info {
+      font-size: 12px;
+      color: #777;
+      margin-bottom: 10px;
+    }
+    .whatsapp-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      background: #25D366;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 15px;
+      padding: 11px 16px;
+      border-radius: 999px;
+      box-shadow: 0 4px 12px rgba(37,211,102,0.4);
+    }
+    .whatsapp-btn:hover {
       opacity: 0.96;
     }
-    .msg-erro {
-      font-size: 13px;
-      color: #b00020;
-      margin-top: 6px;
-    }
-    .info-extra {
-      font-size: 11px;
-      color: #777;
-      margin-top: 6px;
-    }
+
+    /* Seção Como Chegar */
     .section {
       background: #ffffff;
       border-radius: 16px;
       padding: 16px 14px 18px;
       box-shadow: 0 4px 14px rgba(0,0,0,0.06);
-      margin-bottom: 16px;
+      margin-top: 10px;
     }
     .section-title {
       font-size: 16px;
@@ -178,6 +175,11 @@ HTML_PAGE = """
     .btn-link:hover {
       background: #d1e7fb;
     }
+
+    /* Fotos */
+    .photos-section {
+      margin-top: 16px;
+    }
     .photos-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -194,6 +196,8 @@ HTML_PAGE = """
       justify-content: center;
       font-size: 12px;
       color: #555;
+      text-align: center;
+      padding: 4px;
     }
     .photo-card img {
       width: 100%;
@@ -201,19 +205,12 @@ HTML_PAGE = """
       object-fit: cover;
       display: block;
     }
+
     footer {
-      margin-top: 16px;
+      margin-top: 18px;
       text-align: center;
       font-size: 11px;
       color: #777;
-    }
-
-    @media (min-width: 720px) {
-      .main-layout {
-        display: grid;
-        grid-template-columns: 1.2fr 1fr;
-        gap: 18px;
-      }
     }
   </style>
 </head>
@@ -221,111 +218,110 @@ HTML_PAGE = """
   <div class="page">
     <header>
       <div class="logo">GÁS USINA</div>
-      <div class="slogan">Seu gás rápido, seguro e perto de você.</div>
+      <div class="slogan">Atendimento rápido pelo WhatsApp e depósito físico à sua disposição.</div>
     </header>
 
-    <div class="main-layout">
-      <!-- BLOCO PRINCIPAL: PEDIDO PELO WHATSAPP -->
-      <div class="main-card">
-        <div class="main-title">Peça seu gás pelo WhatsApp</div>
-        <p class="main-text">
-          Digite seu número de WhatsApp para fazer seu pedido de gás. Nós
-          registramos seu contato e você é direcionado direto para o nosso atendimento.
-        </p>
+    <div class="layout">
+      <!-- BLOCO: CHAT VIA WHATSAPP -->
+      <div>
+        <div class="chat-card">
+          <div class="chat-header">
+            <div class="chat-avatar">G</div>
+            <div class="chat-agent">
+              <div class="chat-agent-name">Atendimento GÁS USINA</div>
+              <div class="chat-agent-status">🟢 Online agora</div>
+            </div>
+          </div>
 
-        <form method="post">
-          <div class="field-label">Seu WhatsApp (com DDD):</div>
-          <input
-            type="tel"
-            name="telefone"
-            placeholder="Ex: 11 98818-0989"
-            value="{{ phone_value }}"
-            required
+          <div class="chat-body">
+            <p>Olá! Seja bem-vindo à GÁS USINA 👋</p>
+            <p>Clique no botão abaixo para falar com a nossa equipe pelo WhatsApp e fazer seu pedido de gás sem burocracia.</p>
+          </div>
+
+          <div class="chat-info">
+            • Atendimento pelo WhatsApp: todos os dias, das 8h às 22h.
+          </div>
+
+          <a
+            class="whatsapp-btn"
+            href="{{ whatsapp_url }}"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-          <button type="submit">Continuar no WhatsApp</button>
-        </form>
-
-        {% if error_message %}
-        <div class="msg-erro">{{ error_message }}</div>
-        {% endif %}
-
-        <div class="info-extra">
-          Atendimento pelo WhatsApp: todos os dias, das 8h às 22h.
+            💬 Iniciar atendimento no WhatsApp
+          </a>
         </div>
       </div>
 
       <!-- BLOCO: COMO CHEGAR -->
-      <div class="section">
-        <div class="section-title">Como chegar ao depósito GÁS USINA</div>
-        <p>
-          <strong>Endereço:</strong><br>
-          Rua Exemplo, 123 – Bairro Central<br>
-          Cidade/UF – CEP 00000-000
-        </p>
-        <p>
-          <strong>Pontos de referência:</strong><br>
-          • 200m após o Supermercado Exemplo<br>
-          • Ao lado do Posto de Combustível Modelo<br>
-          • Fácil acesso pela Avenida Principal
-        </p>
-        <span class="badge-ref">Fácil estacionamento em frente ao depósito</span>
+      <div>
+        <div class="section">
+          <div class="section-title">Como chegar ao depósito GÁS USINA</div>
+          <p>
+            <strong>Endereço:</strong><br>
+            Rua Exemplo, 123 – Bairro Central<br>
+            Cidade/UF – CEP 00000-000
+          </p>
+          <p>
+            <strong>Pontos de referência:</strong><br>
+            • 200m após o Supermercado Exemplo<br>
+            • Ao lado do Posto de Combustível Modelo<br>
+            • Fácil acesso pela Avenida Principal
+          </p>
+          <span class="badge-ref">Fácil estacionamento em frente ao depósito</span>
 
-        <div class="buttons-row">
-          <a
-            class="btn-link"
-            href="https://www.google.com/maps/search/?api=1&query=Gas+Usina,+Rua+Exemplo+123,+Cidade+UF"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            🗺️ Abrir no Google Maps
-          </a>
-          <!-- Se quiser usar Waze no futuro, troque o link abaixo pela sua lat/long -->
-          <a
-            class="btn-link"
-            href="https://waze.com/ul"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            🚗 Ir com Waze
-          </a>
+          <div class="buttons-row">
+            <a
+              class="btn-link"
+              href="https://www.google.com/maps/search/?api=1&query=Gas+Usina,+Rua+Exemplo+123,+Cidade+UF"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              🗺️ Abrir no Google Maps
+            </a>
+            <a
+              class="btn-link"
+              href="https://waze.com/ul"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              🚗 Ir com Waze
+            </a>
+          </div>
+
+          <p class="chat-info">
+            Horário de atendimento no depósito: segunda a sábado, das 8h às 18h.
+          </p>
         </div>
-
-        <p class="info-extra">
-          Horário de atendimento no depósito: segunda a sábado, das 8h às 18h.
-        </p>
       </div>
     </div>
 
     <!-- BLOCO: FOTOS DO DEPÓSITO -->
-    <div class="section">
+    <div class="section photos-section">
       <div class="section-title">Fotos do nosso depósito</div>
       <p>
-        Conheça um pouco da estrutura da GÁS USINA. Local seguro, organizado e pronto
+        Veja um pouco da estrutura da GÁS USINA. Local organizado, seguro e pronto
         para atender você com rapidez.
       </p>
 
       <div class="photos-grid">
-        <!-- Quando você tiver as fotos, salve em static/img/ e troque os src abaixo -->
         <div class="photo-card">
-          <span>Foto do depósito 1</span>
-          <!-- Exemplo com imagem real:
-          <img src="/static/img/deposito1.jpg" alt="Depósito GÁS USINA 1">
-          -->
+          Foto do depósito 1<br>(depois trocamos por uma imagem real)
         </div>
         <div class="photo-card">
-          <span>Foto do depósito 2</span>
+          Foto do depósito 2
         </div>
         <div class="photo-card">
-          <span>Foto do caminhão de entrega</span>
+          Caminhão de entrega
         </div>
         <div class="photo-card">
-          <span>Foto dos botijões organizados</span>
+          Botijões organizados
         </div>
       </div>
     </div>
 
     <footer>
-      GÁS USINA &middot; Pedido rápido pelo WhatsApp &middot; Depósito físico à sua disposição.
+      GÁS USINA · Atendimento rápido pelo WhatsApp · Depósito físico à sua disposição.
     </footer>
   </div>
 </body>
@@ -333,43 +329,11 @@ HTML_PAGE = """
 """
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/")
 def index():
-    import urllib.parse
-
-    error_message = None
-    phone_value = ""
-
-    if request.method == "POST":
-        raw_phone = request.form.get("telefone", "")
-        phone_value = raw_phone
-
-        # Mantém só dígitos no telefone do cliente
-        telefone_cliente = re.sub(r"\\D", "", raw_phone)
-
-        if len(telefone_cliente) < 10:
-            error_message = "Por favor, informe um número de WhatsApp válido com DDD."
-        else:
-            # Salva no banco (ignora se já existir)
-            conn = get_db()
-            conn.execute(
-                "INSERT OR IGNORE INTO clientes (telefone, criado_em) VALUES (?, datetime('now'))",
-                (telefone_cliente,),
-            )
-            conn.commit()
-            conn.close()
-
-            # Monta o link do WhatsApp e redireciona direto
-            encoded_msg = urllib.parse.quote(WHATSAPP_MESSAGE)
-            whatsapp_url = f"https://wa.me/{WHATSAPP_NUMBER}?text={encoded_msg}"
-            return redirect(whatsapp_url)
-
-    # Se for GET ou se houve erro, renderiza a página normalmente
-    return render_template_string(
-      HTML_PAGE,
-      error_message=error_message,
-      phone_value=phone_value,
-    )
+    encoded_msg = urllib.parse.quote(WHATSAPP_MESSAGE)
+    whatsapp_url = f"https://wa.me/{WHATSAPP_NUMBER}?text={encoded_msg}"
+    return render_template_string(HTML_PAGE, whatsapp_url=whatsapp_url)
 
 
 if __name__ == "__main__":
