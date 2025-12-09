@@ -65,18 +65,23 @@ HTML_PAGE = """
       gap: 10px;
       margin-bottom: 14px;
     }
-    .chat-avatar {
+        .chat-avatar {
       width: 38px;
       height: 38px;
       border-radius: 50%;
+      overflow: hidden;
       background: #e65100;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #fff;
-      font-size: 18px;
-      font-weight: bold;
     }
+    .chat-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
     .chat-agent {
       display: flex;
       flex-direction: column;
