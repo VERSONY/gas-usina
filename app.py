@@ -7,7 +7,6 @@ app = Flask(__name__)
 WHATSAPP_NUMBER = "5511988180989"
 WHATSAPP_MESSAGE = "Olá! Gostaria de falar com a GÁS USINA sobre pedido de gás."
 
-
 HTML_PAGE = """
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -65,12 +64,13 @@ HTML_PAGE = """
       gap: 10px;
       margin-bottom: 14px;
     }
-        .chat-avatar {
-      width: 38px;
-      height: 38px;
+    .chat-avatar {
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       overflow: hidden;
-      background: #e65100;
+      background: #ffffff;
+      border: 2px solid #e0e0e0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -230,16 +230,17 @@ HTML_PAGE = """
       <!-- BLOCO: CHAT VIA WHATSAPP -->
       <div>
         <div class="chat-card">
-                    <div class="chat-header">
+          <div class="chat-header">
             <div class="chat-avatar">
-              <img src="/static/logo-gas-usina.png" alt="Logo GÁS USINA" class="chat-avatar-img">
+              <img src="/static/Screenshot_18.png" alt="Logo GÁS USINA" class="chat-avatar-img">
             </div>
             <div class="chat-agent">
               <div class="chat-agent-name">Atendimento GÁS USINA</div>
               <div class="chat-agent-status">🟢 Online agora</div>
             </div>
           </div>
-            <div class="chat-body">
+
+          <div class="chat-body">
             <p>Olá! Seja bem-vindo à GÁS USINA 👋</p>
             <p>Clique no botão abaixo para falar com a nossa equipe pelo WhatsApp e fazer seu pedido de gás sem burocracia.</p>
           </div>
@@ -334,13 +335,11 @@ HTML_PAGE = """
 </html>
 """
 
-
 @app.route("/")
 def index():
     encoded_msg = urllib.parse.quote(WHATSAPP_MESSAGE)
     whatsapp_url = f"https://wa.me/{WHATSAPP_NUMBER}?text={encoded_msg}"
     return render_template_string(HTML_PAGE, whatsapp_url=whatsapp_url)
-
 
 if __name__ == "__main__":
     app.run(debug=True)
