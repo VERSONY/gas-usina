@@ -311,21 +311,21 @@ HTML_PAGE = """
         para atender você com rapidez.
       </p>
 
-      <div class="photos-grid">
-        <div class="photo-card">
-          Foto do depósito 1<br>(depois trocamos por uma imagem real)
-        </div>
-        <div class="photo-card">
-          Foto do depósito 2
-        </div>
-        <div class="photo-card">
-          Caminhão de entrega
-        </div>
-        <div class="photo-card">
-          Botijões organizados
-        </div>
-      </div>
-    </div>
+     <div class="photos-grid">
+  <div class="photo-card">
+    <img src="/static/deposito1.jpg" alt="Depósito Gás Usina 1">
+  </div>
+  <div class="photo-card">
+    <img src="/static/deposito2.jpg" alt="Depósito Gás Usina 2">
+  </div>
+  <div class="photo-card">
+    <img src="/static/deposito3.jpg" alt="Caminhão de entrega Gás Usina">
+  </div>
+  <div class="photo-card">
+    <img src="/static/deposito4.jpg" alt="Botijões organizados Gás Usina">
+  </div>
+</div>
+
 
     <footer>
       GÁS USINA · Atendimento rápido pelo WhatsApp · Depósito físico à sua disposição.
