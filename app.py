@@ -230,15 +230,16 @@ HTML_PAGE = """
       <!-- BLOCO: CHAT VIA WHATSAPP -->
       <div>
         <div class="chat-card">
-          <div class="chat-header">
-            <div class="chat-avatar">G</div>
+                    <div class="chat-header">
+            <div class="chat-avatar">
+              <img src="/static/logo-gas-usina.png" alt="Logo GÁS USINA" class="chat-avatar-img">
+            </div>
             <div class="chat-agent">
               <div class="chat-agent-name">Atendimento GÁS USINA</div>
               <div class="chat-agent-status">🟢 Online agora</div>
             </div>
           </div>
-
-          <div class="chat-body">
+            <div class="chat-body">
             <p>Olá! Seja bem-vindo à GÁS USINA 👋</p>
             <p>Clique no botão abaixo para falar com a nossa equipe pelo WhatsApp e fazer seu pedido de gás sem burocracia.</p>
           </div>
