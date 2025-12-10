@@ -237,6 +237,7 @@ HTML_PAGE = """
       overflow: hidden;
       border: 1px solid #e5e7eb;
       background: #f3f4f6;
+      margin-top: 8px;
     }
     .map-frame {
       width: 100%;
@@ -244,7 +245,7 @@ HTML_PAGE = """
       border: 0;
     }
 
-    /* Seção Como Chegar (quando dentro da coluna esquerda) */
+    /* Seção Como Chegar (coluna esquerda) */
     .section {
       background: #ffffff;
       border-radius: 18px;
@@ -384,29 +385,35 @@ HTML_PAGE = """
           </a>
         </div>
 
-        <!-- COMO CHEGAR AGORA LOGO ABAIXO DO CHAT -->
+        <!-- COMO CHEGAR ABAIXO DO CHAT -->
         <div class="section">
           <div class="section-title">Como chegar ao depósito GÁS USINA</div>
+
           <p>
             <strong>Endereço:</strong><br>
-            Rua Exemplo, 123 – Bairro Central<br>
-            Cidade/UF – CEP 00000-000
+            Estr. Hisaichi Takebayashi, 7530<br>
+            Jardim Colonial – Atibaia/SP<br>
+            Brasil
           </p>
 
           <p>
             <strong>Pontos de referência:</strong><br>
-            • 200m após o Supermercado Exemplo<br>
-            • Ao lado do Posto de Combustível Modelo<br>
-            • Fácil acesso pela Avenida Principal
+            • Próximo à região da Usina<br>
+            • Localizado na Estrada Hisaichi Takebayashi<br>
+            • Região bem sinalizada e de fácil localização
           </p>
 
           <span class="badge-ref">Fácil estacionamento em frente ao depósito</span>
 
           <div class="buttons-row">
-            <a class="btn-link" href="https://www.google.com/maps/search/?api=1&query=Gas+Usina" target="_blank">
+            <a class="btn-link"
+               href="https://www.google.com/maps/search/?api=1&query=Estrada+Hisaichi+Takebayashi,+7530,+Jardim+Colonial,+Atibaia+SP"
+               target="_blank">
               🗺️ Abrir no Google Maps
             </a>
-            <a class="btn-link" href="https://waze.com/ul" target="_blank">
+            <a class="btn-link"
+               href="https://waze.com/ul?q=Estrada+Hisaichi+Takebayashi,+7530,+Jardim+Colonial,+Atibaia+SP&navigate=yes"
+               target="_blank">
               🚗 Ir com Waze
             </a>
           </div>
@@ -441,7 +448,7 @@ HTML_PAGE = """
           <div class="map-wrapper">
             <iframe
               class="map-frame"
-              src="https://www.google.com/maps?q=Gas+Usina&output=embed"
+              src="https://www.google.com/maps?q=Estrada+Hisaichi+Takebayashi,+7530,+Jardim+Colonial,+Atibaia+SP&output=embed"
               loading="lazy"
               referrerpolicy="no-referrer-when-downgrade">
             </iframe>
@@ -450,7 +457,7 @@ HTML_PAGE = """
       </div>
     </div>
 
-    <!-- SEÇÃO: FOTOS (FULL WIDTH, EMBAIXO DAS DUAS COLUNAS) -->
+    <!-- SEÇÃO: FOTOS (FULL WIDTH) -->
     <div class="section photos-section">
       <div class="section-title">Fotos do nosso depósito</div>
       <p>Veja um pouco da estrutura da GÁS USINA. Local organizado, seguro e pronto para atender você com rapidez.</p>
