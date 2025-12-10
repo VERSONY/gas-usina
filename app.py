@@ -534,7 +534,7 @@ HTML_PAGE = """
 
       <div class="photos-grid">
         <div class="photo-card">
-          <img src="/static/deposito1.jpg" alt="Depósito Gás Usina - Fachada">
+          <img src="/static/deposito_1.jpg" alt="Depósito Gás Usina - Fachada">
         </div>
         <div class="photo-card">
           Foto do depósito 2 (adicione como <code>deposito2.jpg</code> na pasta <code>static/</code>).
