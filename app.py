@@ -1,11 +1,39 @@
-from flask import Flask, render_template_string
+from flask import Flask, render_template_string, redirect, request
 import urllib.parse
+import sqlite3
+import os
 
 app = Flask(__name__)
+
+# Caminho do banco de dados
+DB_PATH = "dados.db"
 
 # Configuração do WhatsApp da GÁS USINA
 WHATSAPP_NUMBER = "5511988180989"
 WHATSAPP_MESSAGE = "Olá! Gostaria de falar com a GÁS USINA sobre pedido de gás."
+
+
+def init_db():
+  """Cria o banco de dados e a tabela de pedidos se ainda não existirem."""
+  conn = sqlite3.connect(DB_PATH)
+  cur = conn.cursor()
+  cur.execute(
+    """
+    CREATE TABLE IF NOT EXISTS pedidos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        criado_em TEXT DEFAULT CURRENT_TIMESTAMP,
+        ip TEXT,
+        user_agent TEXT
+    )
+    """
+  )
+  conn.commit()
+  conn.close()
+
+
+# inicializa o banco quando o app sobe
+init_db()
+
 
 HTML_PAGE = """
 <!DOCTYPE html>
@@ -169,6 +197,12 @@ HTML_PAGE = """
     }
     .chat-info strong {
       color: #111827;
+    }
+    .chat-info .small-note {
+      display: block;
+      margin-top: 4px;
+      font-size: 11px;
+      color: #9ca3af;
     }
     .whatsapp-btn {
       display: inline-flex;
@@ -335,6 +369,39 @@ HTML_PAGE = """
       font-size: 11px;
       color: #9ca3af;
     }
+
+    /* Tabela admin */
+    .admin-page {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+      font-family: Arial, sans-serif;
+    }
+    .admin-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    .admin-table th,
+    .admin-table td {
+      border: 1px solid #d1d5db;
+      padding: 6px 8px;
+    }
+    .admin-table th {
+      background: #f3f4f6;
+      text-align: left;
+    }
+    .admin-note {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 6px;
+    }
   </style>
 </head>
 <body>
@@ -378,9 +445,12 @@ HTML_PAGE = """
 
           <div class="chat-info">
             <strong>Horário WhatsApp:</strong> todos os dias, das <strong>09:00 às 22:00</strong>.
+            <span class="small-note">
+              Ao clicar, registramos data, IP e navegador apenas para controle interno de atendimento.
+            </span>
           </div>
 
-          <a class="whatsapp-btn" href="{{ whatsapp_url }}" target="_blank" rel="noopener noreferrer">
+          <a class="whatsapp-btn" href="{{ pedido_url }}" target="_blank" rel="noopener noreferrer">
             <span>💬</span> <span>Iniciar atendimento no WhatsApp</span>
           </a>
         </div>
@@ -486,16 +556,107 @@ HTML_PAGE = """
 </html>
 """
 
+ADMIN_PAGE = """
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Pedidos GÁS USINA</title>
+</head>
+<body>
+  <div class="admin-page">
+    <div class="admin-title">Relatório de acessos ao botão de WhatsApp</div>
+    <p class="admin-note">
+      Listando os últimos {{ total }} registros (data/hora, IP e navegador).
+    </p>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Data/Hora</th>
+          <th>IP</th>
+          <th>Navegador (User-Agent)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in pedidos %}
+        <tr>
+          <td>{{ p.id }}</td>
+          <td>{{ p.criado_em }}</td>
+          <td>{{ p.ip }}</td>
+          <td>{{ p.user_agent }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="admin-note">
+      URL desta página: <code>/admin/pedidos</code> — não está protegida por senha, use apenas para controle interno.
+    </p>
+  </div>
+</body>
+</html>
+"""
+
+
 @app.route("/")
 def index():
-    encoded_msg = urllib.parse.quote(WHATSAPP_MESSAGE)
-    whatsapp_url = f"https://wa.me/{WHATSAPP_NUMBER}?text={encoded_msg}"
+  encoded_msg = urllib.parse.quote(WHATSAPP_MESSAGE)
+  whatsapp_url = f"https://wa.me/{WHATSAPP_NUMBER}?text={encoded_msg}"
 
-    # Gera URL do QR Code com base no link do WhatsApp
-    qr_data = urllib.parse.quote(whatsapp_url, safe="")
-    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={qr_data}"
+  # Gera URL do QR Code com base no link do WhatsApp
+  qr_data = urllib.parse.quote(whatsapp_url, safe="")
+  qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={qr_data}"
 
-    return render_template_string(HTML_PAGE, whatsapp_url=whatsapp_url, qr_url=qr_url)
+  # rota interna que registra pedido antes de redirecionar
+  pedido_url = "/fazer-pedido"
+
+  return render_template_string(
+    HTML_PAGE,
+    whatsapp_url=whatsapp_url,
+    qr_url=qr_url,
+    pedido_url=pedido_url,
+  )
+
+
+@app.route("/fazer-pedido")
+def fazer_pedido():
+  """Registra o acesso ao botão e redireciona para o WhatsApp."""
+  encoded_msg = urllib.parse.quote(WHATSAPP_MESSAGE)
+  whatsapp_url = f"https://wa.me/{WHATSAPP_NUMBER}?text={encoded_msg}"
+
+  # Pega IP (considerando proxy do Render) e user-agent
+  ip = request.headers.get("X-Forwarded-For", request.remote_addr)
+  if ip and "," in ip:
+    ip = ip.split(",")[0].strip()
+  user_agent = request.headers.get("User-Agent", "")
+
+  conn = sqlite3.connect(DB_PATH)
+  cur = conn.cursor()
+  cur.execute(
+    "INSERT INTO pedidos (ip, user_agent) VALUES (?, ?)",
+    (ip, user_agent),
+  )
+  conn.commit()
+  conn.close()
+
+  return redirect(whatsapp_url)
+
+
+@app.route("/admin/pedidos")
+def admin_pedidos():
+  """Página simples para ver os últimos pedidos registrados."""
+  conn = sqlite3.connect(DB_PATH)
+  conn.row_factory = sqlite3.Row
+  cur = conn.cursor()
+  cur.execute(
+    "SELECT id, criado_em, ip, user_agent FROM pedidos "
+    "ORDER BY id DESC LIMIT 50"
+  )
+  rows = cur.fetchall()
+  conn.close()
+
+  return render_template_string(ADMIN_PAGE, pedidos=rows, total=len(rows))
+
 
 if __name__ == "__main__":
-    app.run(debug=True)
+  app.run(debug=True)
