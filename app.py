@@ -101,6 +101,7 @@ HTML_PAGE = """
       border-radius: 18px;
       padding: 18px 16px 22px;
       box-shadow: 0 8px 24px rgba(15, 23, 42, 0.09);
+      margin-bottom: 16px;
     }
     .chat-header {
       display: flex;
@@ -150,7 +151,6 @@ HTML_PAGE = """
       box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.35);
       animation: pulse 1.4s infinite;
     }
-
     .chat-body {
       background: #e0f2fe;
       border-radius: 14px;
@@ -232,7 +232,6 @@ HTML_PAGE = """
       color: #4b5563;
       max-width: 220px;
     }
-
     .map-wrapper {
       border-radius: 12px;
       overflow: hidden;
@@ -245,13 +244,15 @@ HTML_PAGE = """
       border: 0;
     }
 
-    /* Seção Como Chegar */
+    /* Seção Como Chegar (quando dentro da coluna esquerda) */
     .section {
       background: #ffffff;
       border-radius: 18px;
       padding: 16px 14px 18px;
       box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
-      margin-top: 18px;
+    }
+    .section + .section {
+      margin-top: 14px;
     }
     .section-title {
       font-size: 16px;
@@ -354,7 +355,7 @@ HTML_PAGE = """
     </div>
 
     <div class="layout">
-      <!-- BLOCO: CHAT VIA WHATSAPP -->
+      <!-- COLUNA ESQUERDA: WhatsApp + Como chegar -->
       <div>
         <div class="chat-card">
           <div class="chat-header">
@@ -382,9 +383,43 @@ HTML_PAGE = """
             <span>💬</span> <span>Iniciar atendimento no WhatsApp</span>
           </a>
         </div>
+
+        <!-- COMO CHEGAR AGORA LOGO ABAIXO DO CHAT -->
+        <div class="section">
+          <div class="section-title">Como chegar ao depósito GÁS USINA</div>
+          <p>
+            <strong>Endereço:</strong><br>
+            Rua Exemplo, 123 – Bairro Central<br>
+            Cidade/UF – CEP 00000-000
+          </p>
+
+          <p>
+            <strong>Pontos de referência:</strong><br>
+            • 200m após o Supermercado Exemplo<br>
+            • Ao lado do Posto de Combustível Modelo<br>
+            • Fácil acesso pela Avenida Principal
+          </p>
+
+          <span class="badge-ref">Fácil estacionamento em frente ao depósito</span>
+
+          <div class="buttons-row">
+            <a class="btn-link" href="https://www.google.com/maps/search/?api=1&query=Gas+Usina" target="_blank">
+              🗺️ Abrir no Google Maps
+            </a>
+            <a class="btn-link" href="https://waze.com/ul" target="_blank">
+              🚗 Ir com Waze
+            </a>
+          </div>
+
+          <p class="chat-info" style="margin-top: 10px;">
+            <strong>Horário do depósito:</strong><br>
+            • Segunda a sexta: 09:00 às 22:00<br>
+            • Sábado e domingo: 09:00 às 15:00
+          </p>
+        </div>
       </div>
 
-      <!-- BLOCO: QR CODE + MAPA -->
+      <!-- COLUNA DIREITA: QR CODE + MAPA -->
       <div>
         <div class="side-card">
           <div class="side-title">Pedir pelo QR Code</div>
@@ -395,7 +430,8 @@ HTML_PAGE = """
               <img src="{{ qr_url }}" alt="QR Code WhatsApp GÁS USINA">
             </div>
             <div class="qr-text">
-              Abra a câmera do seu celular ou o app de leitura de QR Code e aponte para o código ao lado. Você será direcionado diretamente para o nosso WhatsApp.
+              Abra a câmera do seu celular ou o app de leitura de QR Code e aponte para o código ao lado. Você será
+              direcionado diretamente para o nosso WhatsApp.
             </div>
           </div>
 
@@ -414,41 +450,7 @@ HTML_PAGE = """
       </div>
     </div>
 
-    <!-- SEÇÃO: COMO CHEGAR -->
-    <div class="section">
-      <div class="section-title">Como chegar ao depósito GÁS USINA</div>
-      <p>
-        <strong>Endereço:</strong><br>
-        Rua Exemplo, 123 – Bairro Central<br>
-        Cidade/UF – CEP 00000-000
-      </p>
-
-      <p>
-        <strong>Pontos de referência:</strong><br>
-        • 200m após o Supermercado Exemplo<br>
-        • Ao lado do Posto de Combustível Modelo<br>
-        • Fácil acesso pela Avenida Principal
-      </p>
-
-      <span class="badge-ref">Fácil estacionamento em frente ao depósito</span>
-
-      <div class="buttons-row">
-        <a class="btn-link" href="https://www.google.com/maps/search/?api=1&query=Gas+Usina" target="_blank">
-          🗺️ Abrir no Google Maps
-        </a>
-        <a class="btn-link" href="https://waze.com/ul" target="_blank">
-          🚗 Ir com Waze
-        </a>
-      </div>
-
-      <p class="chat-info" style="margin-top: 10px;">
-        <strong>Horário do depósito:</strong><br>
-        • Segunda a sexta: 09:00 às 22:00<br>
-        • Sábado e domingo: 09:00 às 15:00
-      </p>
-    </div>
-
-    <!-- SEÇÃO: FOTOS -->
+    <!-- SEÇÃO: FOTOS (FULL WIDTH, EMBAIXO DAS DUAS COLUNAS) -->
     <div class="section photos-section">
       <div class="section-title">Fotos do nosso depósito</div>
       <p>Veja um pouco da estrutura da GÁS USINA. Local organizado, seguro e pronto para atender você com rapidez.</p>
