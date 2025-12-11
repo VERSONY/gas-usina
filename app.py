@@ -658,5 +658,9 @@ def admin_pedidos():
   return render_template_string(ADMIN_PAGE, pedidos=rows, total=len(rows))
 
 
+import os
+
 if __name__ == "__main__":
-  app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # Railway envia a porta pela variável PORT
+    app.run(host="0.0.0.0", port=port)
+
